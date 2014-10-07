@@ -1,6 +1,36 @@
 require 'spec_helper'
 
 describe GlobalStore::Store do
+  before(:each) do
+    GlobalStore.configure do |config|
+      config.storage = RequestStore
+    end
+  end
+  after(:each) do
+    GlobalStore.reset_configuration!
+  end
+  describe ".key_prefix" do
+    subject { GlobalStore::Store }
+    it "uses the key_prefix provided by the configuration that defaults to global_store" do
+      subject.set(:some_key, "value")
+      expect(subject.exists?(:global_store_some_key)).to eq(true)
+    end
+    it "uses a custom key prefix if specified" do
+      GlobalStore.configure { |config| config.key_prefix = :oh_noes}
+      subject.set(:some_key, "value")
+      expect(subject.exists?(:oh_noes_some_key)).to eq(true)
+    end
+  end
+
+  describe ".storage" do
+    subject { GlobalStore::Store} 
+    it "uses the storage provided" do
+      GlobalStore.configure{ |config| config.storage = Thread.current }
+      subject.set(:some_key, "value")
+      expect(Thread.current.key?(:global_store_some_key)).to eq(true)
+    end
+  end
+
   describe ".get" do
     subject { GlobalStore::Store }
     it "returns the value if it had been previously set" do
@@ -13,6 +43,10 @@ describe GlobalStore::Store do
     end
     it "returns nil if the key is not set" do
       expect(subject.get('albatross')).to be_nil
+    end
+    it "is aliased as []" do
+      subject.set('wat', ['is', 'dat'])
+      expect(subject['wat']).to eq(['is', 'dat'])
     end
   end
 
@@ -29,6 +63,10 @@ describe GlobalStore::Store do
     end
     it "returns the value it sets" do
       expect(subject.set('alert', 'ERR_OUT_OF_COFFEE')).to eq('ERR_OUT_OF_COFFEE')
+    end
+    it "is aliased as []=" do
+      subject['albatross_flavour'] = 'seagull'
+      expect(subject.get('albatross_flavour')).to eq('seagull')
     end
   end
 

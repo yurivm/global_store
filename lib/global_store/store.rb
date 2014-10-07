@@ -24,11 +24,13 @@ module GlobalStore
       end
       
       alias_method :exist?, :exists?
+      alias_method :[], :get
+      alias_method :[]=, :set
 
       protected
 
       def storage
-        RequestStore
+        ::GlobalStore.configuration.storage
       end
 
       def prefixed_key(key)
@@ -36,7 +38,7 @@ module GlobalStore
       end
 
       def key_prefix
-        :db_versioning
+        ::GlobalStore.configuration.key_prefix
       end
 
       private
