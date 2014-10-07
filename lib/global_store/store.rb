@@ -14,11 +14,16 @@ module GlobalStore
         storage[prefixed_key(key)].respond_to?(:blank?) ? storage[prefixed_key(key)].blank? : object_blank?(storage[prefixed_key(key)])
       end
 
-      alias_method :exists?, :present?
 
       def set(key, value)
         storage[prefixed_key(key)] = value
       end
+
+      def exists?(keyname)
+        storage.exist?(keyname)
+      end
+      
+      alias_method :exist?, :exists?
 
       protected
 

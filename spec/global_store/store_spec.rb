@@ -43,10 +43,30 @@ describe GlobalStore::Store do
     end
   end
 
+
+  describe ".blank?" do
+    subject { GlobalStore::Store }
+    it "returns true if the value specified by the key is blank (not present)" do
+      expect(subject.blank?(:whats_your_status)).to eq(true)
+    end
+    it "returns false otherwise" do
+      subject.set(:parrot, :is_no_more)
+      expect(subject.blank?(:parrot)).to eq(false)
+    end
+  end
+
   describe ".exists?" do
     subject { GlobalStore::Store }
-    it "is just an alias for .present?" do
-      expect(subject.method(:exists?)).to eq(subject.method(:present?))
+    it "returns true if the specified key exists (i.e. has been set)" do
+      subject.set(:lunchtime, nil)
+      expect(subject.exists?(:lunchtime)).to eq(false)
+    end
+  end
+
+  describe ".exist?" do
+    subject { GlobalStore::Store }
+    it "is just an alias for .exists?" do
+      expect(subject.method(:exist?)).to eq(subject.method(:exists?))
     end
   end
 
